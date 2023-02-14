@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using BookLibrary.Models;
 
 namespace BookLibrary
 {
@@ -28,6 +30,7 @@ namespace BookLibrary
         {
 
             services.AddControllers();
+            services.AddDbContext<BookLibraryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("BookLibraryConnectionString")));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookLibrary", Version = "v1" });
