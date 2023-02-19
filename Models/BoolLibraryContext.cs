@@ -1,8 +1,9 @@
 ﻿using BookLibrary.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-public class BookLibraryContext : DbContext
+public class BookLibraryContext : IdentityDbContext<User>
 {
     public DbSet<Book> Books { get; set; }
     public DbSet<Author> Authors { get; set; }
@@ -12,10 +13,12 @@ public class BookLibraryContext : DbContext
     public DbSet<Publisher> Publishers { get; set; }
     public DbSet<CoverType> CoverTypes { get; set; }
 
-    public DbSet<User> Users { get; set; }
 
-    public BookLibraryContext(DbContextOptions<BookLibraryContext> options)
-        : base(options)
+    public BookLibraryContext(DbContextOptions<BookLibraryContext> options) : base(options)
     {
+    }
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
     }
 }
