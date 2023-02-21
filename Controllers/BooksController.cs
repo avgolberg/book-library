@@ -59,6 +59,139 @@ namespace BookLibrary.Controllers
             return book;
         }
 
+        // GET: api/Books/
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        [Route("csv")]
+        public async Task<IActionResult> GetBooksCSV()
+        {
+            var books = _context.Books
+                                    .Include(b => b.Authors)
+                                    .Include(b => b.BookTypes)
+                                    .Include(b => b.CoverTypes)
+                                    .Include(b => b.Genres)
+                                    .Include(b => b.Language)
+                                    .Include(b => b.Publisher)
+                                    .ToList();
+
+            if (!books.Any())
+                return NotFound();
+
+            List<FileModel> files = new List<FileModel>();
+
+            var item = books[0];
+            var content = GetCsvFileContent(books, nameof(item.Id), nameof(item.Title), nameof(item.Annotation), nameof(item.Pages), nameof(item.Publisher), nameof(item.Language));
+            files.Add(new FileModel() { FileName = "Books.csv", FileContent = Encoding.ASCII.GetBytes(content) });
+
+            content = GetCsvFileContent(books, nameof(item.Id), nameof(item.Authors));
+            files.Add(new FileModel() { FileName = "BooksAuthors.csv", FileContent = Encoding.ASCII.GetBytes(content) });
+
+            content = GetCsvFileContent(books, nameof(item.Id), nameof(item.Genres));
+            files.Add(new FileModel() { FileName = "BooksGenres.csv", FileContent = Encoding.ASCII.GetBytes(content) });
+
+            content = GetCsvFileContent(books, nameof(item.Id), nameof(item.BookTypes));
+            files.Add(new FileModel() { FileName = "BookBookTypes.csv", FileContent = Encoding.ASCII.GetBytes(content) });
+
+            content = GetCsvFileContent(books, nameof(item.Id), nameof(item.CoverTypes));
+            files.Add(new FileModel() { FileName = "BookCoverTypes.csv", FileContent = Encoding.ASCII.GetBytes(content) });
+
+            return File(files.Compress(), "application/octet-stream", "books.zip");
+        }
+
+        private string GetCsvFileContent(List<Book> books, params string[] columns)
+        {
+            StringBuilder sb = new StringBuilder();
+            List<string> data = new List<string>();
+
+            sb.AppendJoin(",", columns);
+            sb.AppendLine();
+
+            for (int i = 0; i < books.Count; i++)
+            {
+                for (int j = 0; j < columns.Length; j++)
+                {
+                    var book = books[i];
+                    if (nameof(book.Id).Equals(columns[j]))
+                    {
+                        data.Add(book.Id.ToString());
+                    }
+                    else if (nameof(book.Title).Equals(columns[j]))
+                    {
+                        data.Add($"'{book.Title}'");
+                    }
+                    else if (nameof(book.Annotation).Equals(columns[j]))
+                    {
+                        data.Add((book.Annotation != null) ? $"'{book.Annotation}'" : "null");
+                    }
+                    else if (nameof(book.Pages).Equals(columns[j]))
+                    {
+                        data.Add(book.Pages.ToString());
+                    }
+                    else if (nameof(book.Publisher).Equals(columns[j]))
+                    {
+                        data.Add((book.Publisher != null) ? $"'{book.Publisher.Name}'" : "null");
+                    }
+                    else if (nameof(book.Language).Equals(columns[j]))
+                    {
+                        data.Add((book.Language != null) ? $"'{book.Language.Name}'" : "null");
+                    }
+                    else if (nameof(book.Authors).Equals(columns[j]))
+                    {
+                        if (book.Authors == null || book.Authors.Count == 0)
+                            data.Add("null");
+                        else
+                        {
+                            foreach (var author in book.Authors)
+                            {
+                                data.Add(author.Name);
+                            }
+                        }
+                    }
+                    else if (nameof(book.Genres).Equals(columns[j]))
+                    {
+                        if (book.Genres == null || book.Genres.Count == 0)
+                            data.Add("null");
+                        else
+                        {
+                            foreach (var genre in book.Genres)
+                            {
+                                data.Add(genre.Name);
+                            }
+                        }
+                    }
+                    else if (nameof(book.CoverTypes).Equals(columns[j]))
+                    {
+                        if (book.CoverTypes == null || book.CoverTypes.Count == 0)
+                            data.Add("null");
+                        else
+                        {
+                            foreach (var ct in book.CoverTypes)
+                            {
+                                data.Add(ct.Name);
+                            }
+                        }
+                    }
+                    else if (nameof(book.BookTypes).Equals(columns[j]))
+                    {
+                        if (book.BookTypes == null || book.BookTypes.Count == 0)
+                            data.Add("null");
+                        else
+                        {
+                            foreach (var bt in book.BookTypes)
+                            {
+                                data.Add(bt.Name);
+                            }
+                        }
+                    }
+                }
+                sb.AppendJoin(",", data);
+                sb.AppendLine();
+                data.Clear();
+            }
+
+            return sb.ToString();
+        }
+
         // PUT: api/Books/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
