@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BookLibrary.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using BookLibrary.Extensions;
 
 namespace BookLibrary.Controllers
 {
@@ -46,6 +48,13 @@ namespace BookLibrary.Controllers
             {
                 return NotFound();
             }
+
+            _context.Entry(book).Collection(b => b.Authors).Load();
+            _context.Entry(book).Collection(b => b.BookTypes).Load();
+            _context.Entry(book).Collection(b => b.CoverTypes).Load();
+            _context.Entry(book).Collection(b => b.Genres).Load();
+            _context.Entry(book).Reference(b => b.Language).Load();
+            _context.Entry(book).Reference(b => b.Publisher).Load();
 
             return book;
         }
@@ -111,10 +120,73 @@ namespace BookLibrary.Controllers
             return NoContent();
         }
 
+        // POST: api/Books/add-to-favourites
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        [Authorize]
+        [Route("add-to-favourites")]
+        public async Task<ActionResult<Book>> AddToFavourites(int id)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Email.Equals(GetCurrentUserEmail()));
+
+            _context.Entry(user).Collection(u => u.FavouriteBooks).Load();
+
+            if (book == null || user == null)
+            {
+                return NotFound();
+            }
+
+            if (user.FavouriteBooks == null)
+                user.FavouriteBooks = new List<Book>();
+
+            if (user.FavouriteBooks.Contains(book))
+                return BadRequest();
+
+            user.FavouriteBooks.Add(book);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // POST: api/Books/delete-from-favourites
+        [HttpDelete]
+        [Authorize]
+        [Route("delete-from-favourites")]
+        public async Task<IActionResult> DeleteFromFavourites(int id)
+        {
+            var book = _context.Books.FirstOrDefault(b => b.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Email.Equals(GetCurrentUserEmail()));
+
+            _context.Entry(user).Collection(u => u.FavouriteBooks).Load();
+
+            if (book == null || user == null || user.FavouriteBooks == null)
+            {
+                return NotFound();
+            }
+
+            if (!user.FavouriteBooks.Contains(book))
+                return BadRequest();
+
+            user.FavouriteBooks.Remove(book);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.Id == id);
         }
-       
+
+        private string GetCurrentUserEmail()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if (identity == null)
+                return null;
+
+            return identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        }
     }
 }
