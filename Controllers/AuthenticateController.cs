@@ -1,4 +1,5 @@
 ﻿using BookLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,11 +20,13 @@ namespace BookLibrary.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly UserManager<User> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthenticateController(UserManager<User> userManager, IConfiguration configuration)
+        public AuthenticateController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             _configuration = configuration;
         }
 
@@ -37,7 +41,7 @@ namespace BookLibrary.Controllers
 
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -84,7 +88,72 @@ namespace BookLibrary.Controllers
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
+            if (!await roleManager.RoleExistsAsync(UserRoles.Administrator))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Administrator));
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            await userManager.AddToRoleAsync(user, UserRoles.User);
+
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [HttpPost]
+        [Route("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
+        {
+            var userExists = await userManager.FindByNameAsync(model.Name);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+
+            var user = new User()
+            {
+                Email = model.Email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = model.Name
+            };
+
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+
+            if (!await roleManager.RoleExistsAsync(UserRoles.Administrator))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Administrator));
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            await userManager.AddToRoleAsync(user, UserRoles.Administrator);
+
+            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        [Route("change-role")]
+        public async Task<IActionResult> ChangeRole([FromBody] string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User not found!" });
+
+            if (!await roleManager.RoleExistsAsync(UserRoles.Administrator))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.Administrator));
+            if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+            if (userManager.IsInRoleAsync(user, UserRoles.User).Result)
+            {
+                await userManager.RemoveFromRoleAsync(user, UserRoles.User);
+                await userManager.AddToRoleAsync(user, UserRoles.Administrator);
+            }
+            else if(userManager.IsInRoleAsync(user, UserRoles.Administrator).Result)
+            {
+                await userManager.RemoveFromRoleAsync(user, UserRoles.Administrator);
+                await userManager.AddToRoleAsync(user, UserRoles.User);
+            }
+            else return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User doesn't have a role!" });
+
+            return Ok(new Response { Status = "Success", Message = "User's role changed successfully!" });
         }
     }
 }
