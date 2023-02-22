@@ -61,7 +61,7 @@ namespace BookLibrary.Controllers
 
         // GET: api/Books/
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        //[Authorize(Roles = "Administrator")]
         [Route("csv")]
         public async Task<IActionResult> GetBooksCSV()
         {
@@ -137,51 +137,19 @@ namespace BookLibrary.Controllers
                     }
                     else if (nameof(book.Authors).Equals(columns[j]))
                     {
-                        if (book.Authors == null || book.Authors.Count == 0)
-                            data.Add("null");
-                        else
-                        {
-                            foreach (var author in book.Authors)
-                            {
-                                data.Add(author.Name);
-                            }
-                        }
+                        data.AddRange(CheckCollection(book.Authors));
                     }
                     else if (nameof(book.Genres).Equals(columns[j]))
                     {
-                        if (book.Genres == null || book.Genres.Count == 0)
-                            data.Add("null");
-                        else
-                        {
-                            foreach (var genre in book.Genres)
-                            {
-                                data.Add(genre.Name);
-                            }
-                        }
+                        data.AddRange(CheckCollection(book.Genres));
                     }
                     else if (nameof(book.CoverTypes).Equals(columns[j]))
                     {
-                        if (book.CoverTypes == null || book.CoverTypes.Count == 0)
-                            data.Add("null");
-                        else
-                        {
-                            foreach (var ct in book.CoverTypes)
-                            {
-                                data.Add(ct.Name);
-                            }
-                        }
+                        data.AddRange(CheckCollection(book.CoverTypes));
                     }
                     else if (nameof(book.BookTypes).Equals(columns[j]))
                     {
-                        if (book.BookTypes == null || book.BookTypes.Count == 0)
-                            data.Add("null");
-                        else
-                        {
-                            foreach (var bt in book.BookTypes)
-                            {
-                                data.Add(bt.Name);
-                            }
-                        }
+                        data.AddRange(CheckCollection(book.BookTypes));
                     }
                 }
                 sb.AppendJoin(",", data);
@@ -190,6 +158,21 @@ namespace BookLibrary.Controllers
             }
 
             return sb.ToString();
+        }
+
+        private List<string> CheckCollection<T>(List<T> collection)
+        {
+            List<string> data = new List<string>();
+            if (collection == null || collection.Count == 0)
+                data.Add("null");
+            else
+            {
+                foreach (var item in collection)
+                {
+                    data.Add($"'{item}'");
+                }
+            }
+            return data;
         }
 
         // PUT: api/Books/5
