@@ -61,7 +61,7 @@ namespace BookLibrary.Controllers
 
         // GET: api/Books/
         [HttpGet]
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         [Route("csv")]
         public async Task<IActionResult> GetBooksCSV()
         {
@@ -207,12 +207,69 @@ namespace BookLibrary.Controllers
             return NoContent();
         }
 
-        // POST: api/Books
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+        }
+
+        // POST: api/Books
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        [Route("book-model")]
+        public async Task<ActionResult<Book>> PostBook(BookModel bookModel)
+        {
+            var book = new Book()
+            {
+                Title = bookModel.Title,
+                Annotation = bookModel.Annotation,
+                Pages = bookModel.Pages,
+                Publisher = _context.Publishers.Find(bookModel.PublisherId),
+                Language = _context.Languages.Find(bookModel.LanguageId),
+            };
+
+            book.Authors = new List<Author>();
+            book.Genres = new List<Genre>();
+            book.CoverTypes = new List<CoverType>();
+            book.BookTypes = new List<BookType>();
+
+            if (bookModel.AuthorsIds != null)
+            {
+                foreach (int id in bookModel.AuthorsIds)
+                {
+                    book.Authors.Add(_context.Authors.Find(id));
+                }
+            }
+
+            if (bookModel.GenresIds != null)
+            {
+                foreach (int id in bookModel.GenresIds)
+                {
+                    book.Genres.Add(_context.Genres.Find(id));
+                }
+            }
+
+            if (bookModel.CoverTypesIds != null)
+            {
+                foreach (int id in bookModel.CoverTypesIds)
+                {
+                    book.CoverTypes.Add(_context.CoverTypes.Find(id));
+                }
+            }
+
+            if (bookModel.BookTypesIds != null)
+            {
+                foreach (int id in bookModel.BookTypesIds)
+                {
+                    book.BookTypes.Add(_context.BookTypes.Find(id));
+                }
+            }
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
