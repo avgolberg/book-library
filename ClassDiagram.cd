@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="BookLibrary.Models.Author">
+    <Position X="0.5" Y="4.5" Width="1.75" />
+    <AssociationLine Name="Books" Type="BookLibrary.Models.Book">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.082" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACEAAAAAAAAAAEAAAAAAQAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Author.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Books" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.Book">
+    <Position X="3.5" Y="4.5" Width="1.75" />
+    <AssociationLine Name="Genres" Type="BookLibrary.Models.Genre" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.688" Y="6.18" />
+        <Point X="4.688" Y="7.918" />
+        <Point X="2" Y="7.918" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.211" Y="0.083" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="CoverTypes" Type="BookLibrary.Models.CoverType">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.142" Y="0.11" Height="0.182" Width="2.131" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="BookTypes" Type="BookLibrary.Models.BookType">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.072" Y="0.103" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACACAACAAAAEAgCAIAgAAAAABAAAAAAAAAAAiAAAA=</HashCode>
+      <FileName>Models\Book.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Publisher" />
+      <Property Name="Language" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Authors" />
+      <Property Name="Genres" />
+      <Property Name="CoverTypes" />
+      <Property Name="BookTypes" />
+      <Property Name="Users" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.BookModel">
+    <Position X="10.5" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAABgAAAAAAAAEAgAAAAgAAAAwAAAAAAAAAAAEQAAAA=</HashCode>
+      <FileName>Models\BookModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.BookType">
+    <Position X="6.5" Y="2" Width="1.5" />
+    <AssociationLine Name="Books" Type="BookLibrary.Models.Book" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="7.188" Y="3.747" />
+        <Point X="7.188" Y="4.868" />
+        <Point X="5.25" Y="4.868" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.211" Y="0.137" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAQAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\BookType.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Books" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.CoverType">
+    <Position X="0.5" Y="2" Width="1.5" />
+    <AssociationLine Name="Books" Type="BookLibrary.Models.Book">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.124" Y="2.141" Height="0.182" Width="1.56" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAQAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\CoverType.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Books" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.Genre">
+    <Position X="0.5" Y="6.75" Width="1.5" />
+    <AssociationLine Name="Books" Type="BookLibrary.Models.Book" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2" Y="7.303" />
+        <Point X="4.25" Y="7.303" />
+        <Point X="4.25" Y="6.18" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.767" Y="0.854" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAQAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Genre.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Books" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.Language">
+    <Position X="5.5" Y="8.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Language.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.Publisher">
+    <Position X="5.5" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACEAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Publisher.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibraryContext">
+    <Position X="7.75" Y="7" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAACAAAAAAAAAIAAAAAkABAAAAAAAAAAAiAAAA=</HashCode>
+      <FileName>Models\BoolLibraryContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.LoginModel">
+    <Position X="11.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Authentication\LoginModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.RegisterModel">
+    <Position X="13.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAQAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Authentication\RegisterModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.Response">
+    <Position X="12.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Authentication\Response.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.User">
+    <Position X="7.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>Models\Authentication\User.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="FavouriteBooks" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BookLibrary.Models.UserRoles">
+    <Position X="9.5" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Authentication\UserRoles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BookLibrary.Models.FileModel">
+    <Position X="14.5" Y="7" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Models\Export\FileModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.AspNetCore.Identity.IdentityUser" Collapsed="true">
+    <Position X="7.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
